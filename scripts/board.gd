@@ -16,6 +16,9 @@ const WHITE_PAWN = preload("res://scenes/White Pieces/White_Pawn.tscn")
 const WHITE_QUEEN = preload("res://scenes/White Pieces/White_Queen.tscn")
 const WHITE_ROOK = preload("res://scenes/White Pieces/White_Rook.tscn")
 
+const BLACK_TURN = preload("res://scenes/black_turn.tscn")
+const WHITE_TURN = preload("res://scenes/white_turn.tscn")
+
 var board_dim = Vector2(8, 8)
 var temporary_tile = WHITE_TILE.instantiate() as Tile
 var tile_size = Vector2i(16, 16) # temporary_tile.get_tile_size()
@@ -23,11 +26,20 @@ var tile_size = Vector2i(16, 16) # temporary_tile.get_tile_size()
 var board = []
 var selected_piece = null
 var highlighted_tiles: Array[Tile] = []
+var white_turn = true
+var white_turn_indicator = WHITE_TURN.instantiate()
+var black_turn_indicator = BLACK_TURN.instantiate()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var tile
-		
+	
+	add_child(white_turn_indicator)
+	add_child(black_turn_indicator)
+	white_turn_indicator.global_position = get_board_size() / 2 - Vector2(8, 8)
+	black_turn_indicator.global_position = get_board_size() / 2 - Vector2(8, 8)
+	update_turn_indicator()
+	
 	for i in range(board_dim.x):
 		board.append([])
 		for j in range(board_dim.y):
@@ -88,6 +100,11 @@ func get_board_size() -> Vector2:
 	return Vector2(board_dim.x * tile_size.x, board_dim.y * tile_size.y)
 
 func _on_tile_clicked(tile: Tile):
+	if tile.piece != null:
+		if white_turn and tile.piece.color != "white":
+			return
+		if !white_turn and tile.piece.color == "white":
+			return
 	if selected_piece == null:
 		if tile.piece != null:
 			selected_piece = tile.piece
@@ -96,6 +113,7 @@ func _on_tile_clicked(tile: Tile):
 	else:
 		if tile in highlighted_tiles:
 			move_piece(selected_piece, tile)
+			switch_turn()
 			
 		clear_highlighted_tiles()
 		selected_piece = null
@@ -173,3 +191,11 @@ func move_piece(piece: Piece, target_tile: Tile):
 
 func is_within_board(pos: Vector2i) -> bool:
 	return pos.x >= 0 and pos.y >= 0 and pos.x < board_dim.x and pos.y < board_dim.y
+
+func update_turn_indicator():
+	white_turn_indicator.visible = white_turn
+	black_turn_indicator.visible = !white_turn
+	
+func switch_turn():
+	white_turn = !white_turn
+	update_turn_indicator()
