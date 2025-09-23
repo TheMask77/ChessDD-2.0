@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://b64ftjfncpxo"]
+
+[ext_resource type="Texture2D" uid="uid://dovijcsjrjk0u" path="res://assets/white_turn.png" id="1_3kydm"]
+
+[node name="Sprite2D" type="Sprite2D"]
+z_index = -5
+texture = ExtResource("1_3kydm")
