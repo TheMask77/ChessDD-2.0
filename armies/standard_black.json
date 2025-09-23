@@ -1,0 +1,19 @@
+[
+	{"type": "rook", "color": "black", "position": [0,0]},
+	{"type": "knight", "color": "black", "position": [1,0]},
+	{"type": "bishop", "color": "black", "position": [2,0]},
+	{"type": "queen", "color": "black", "position": [3,0]},
+	{"type": "king", "color": "black", "position": [4,0]},
+	{"type": "rook", "color": "black", "position": [7,0]},
+	{"type": "knight", "color": "black", "position": [6,0]},
+	{"type": "bishop", "color": "black", "position": [5,0]},
+	
+	{"type": "pawn", "color": "black", "position": [0,1]},
+	{"type": "pawn", "color": "black", "position": [1,1]},
+	{"type": "pawn", "color": "black", "position": [2,1]},
+	{"type": "pawn", "color": "black", "position": [3,1]},
+	{"type": "pawn", "color": "black", "position": [4,1]},
+	{"type": "pawn", "color": "black", "position": [5,1]},
+	{"type": "pawn", "color": "black", "position": [6,1]},
+	{"type": "pawn", "color": "black", "position": [7,1]},
+]

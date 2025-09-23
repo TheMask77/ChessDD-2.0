@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3 uid="uid://by2i1dvoydibm"]
+
+[ext_resource type="PackedScene" uid="uid://dw4guqspoid8l" path="res://scenes/Piece.tscn" id="1_1338u"]
+[ext_resource type="Texture2D" uid="uid://jc1ug7utrvpn" path="res://assets/WhitePieces.png" id="2_fe2yp"]
+[ext_resource type="Script" uid="uid://cj7e7x6lhieqh" path="res://scripts/pawn.gd" id="3_fe2yp"]
+
+[node name="Sprite2D" instance=ExtResource("1_1338u")]
+texture = ExtResource("2_fe2yp")
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)
+script = ExtResource("3_fe2yp")

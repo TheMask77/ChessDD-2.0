@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3 uid="uid://y6nf0fvtnwqe"]
+
+[ext_resource type="PackedScene" uid="uid://dw4guqspoid8l" path="res://scenes/Piece.tscn" id="1_lopom"]
+[ext_resource type="Texture2D" uid="uid://oma4kl5nb8bh" path="res://assets/BlackPieces.png" id="2_bha12"]
+[ext_resource type="Script" uid="uid://dugxkmksns0ac" path="res://scripts/king.gd" id="3_bha12"]
+
+[node name="Sprite2D" instance=ExtResource("1_lopom")]
+texture = ExtResource("2_bha12")
+region_enabled = true
+region_rect = Rect2(80, 0, 16, 16)
+script = ExtResource("3_bha12")
