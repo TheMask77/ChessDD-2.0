@@ -100,7 +100,7 @@ func get_board_size() -> Vector2:
 	return Vector2(board_dim.x * tile_size.x, board_dim.y * tile_size.y)
 
 func _on_tile_clicked(tile: Tile):
-	if tile.piece != null:
+	if tile.piece != null and selected_piece == null:
 		if white_turn and tile.piece.color != "white":
 			return
 		if !white_turn and tile.piece.color == "white":
@@ -182,6 +182,7 @@ func clear_highlighted_tiles():
 
 func move_piece(piece: Piece, target_tile: Tile):
 	if target_tile.piece != null and target_tile.piece.color != piece.color:
+		print("Chomp")
 		target_tile.piece.queue_free()
 		
 	board[piece.board_position.x][piece.board_position.y].piece = null
