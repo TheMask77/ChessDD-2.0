@@ -19,7 +19,7 @@ const WHITE_ROOK = preload("res://scenes/White Pieces/White_Rook.tscn")
 const BLACK_TURN = preload("res://scenes/black_turn.tscn")
 const WHITE_TURN = preload("res://scenes/white_turn.tscn")
 
-var board_dim = Vector2(8, 8)
+var board_dim = Vector2i(8, 8)
 var temporary_tile = WHITE_TILE.instantiate() as Tile
 var tile_size = Vector2i(16, 16) # temporary_tile.get_tile_size()
 
@@ -105,6 +105,7 @@ func _on_tile_clicked(tile: Tile):
 			return
 		if !white_turn and tile.piece.color == "white":
 			return
+				
 	if selected_piece == null:
 		if tile.piece != null:
 			selected_piece = tile.piece
@@ -114,6 +115,12 @@ func _on_tile_clicked(tile: Tile):
 		if tile in highlighted_tiles:
 			move_piece(selected_piece, tile)
 			switch_turn()
+			print("=================================")
+			print("Current color: ", get_current_color())
+			var is_current_king_in_check = is_king_in_check(get_current_color())
+			print("is_current_king_in_check: ", is_current_king_in_check)
+			print("=================================")
+			print("\n")
 			
 		clear_highlighted_tiles()
 		selected_piece = null
@@ -132,7 +139,7 @@ func get_possible_moves(piece: Piece) -> Array[Vector2i]:
 		if infinite:
 			while is_within_board(current_pos):
 				var tile = board[current_pos.x][current_pos.y]
-				if tile.piece != null and tile.piece.color == selected_piece.color:
+				if tile.piece != null and tile.piece.color == piece.color:
 					break
 				if tile.piece == null:
 					moves.append(current_pos)
@@ -196,7 +203,42 @@ func is_within_board(pos: Vector2i) -> bool:
 func update_turn_indicator():
 	white_turn_indicator.visible = white_turn
 	black_turn_indicator.visible = !white_turn
-	
+
 func switch_turn():
 	white_turn = !white_turn
 	update_turn_indicator()
+
+func check_game_end():
+	pass
+
+func get_king(color: String) -> Node:
+	for piece in get_all_pieces(color):
+		if piece.piece_type == "king":
+			return piece
+	return null
+
+func get_all_pieces(color: String) -> Array:
+	var pieces := []
+	for child in $Pieces.get_children():
+		if child.color == color:
+			pieces.append(child)
+	return pieces
+
+func is_square_attacked(tile: Tile, by_color: String) -> bool:
+	var enemy_pieces = get_all_pieces(by_color)
+	for piece in enemy_pieces:
+		var moves = get_possible_moves(piece)
+		if tile.board_position in moves:
+			return true
+	return false
+
+func is_king_in_check(color: String) -> bool:
+	var king = get_king(color) as King
+	if king == null:
+		return false
+	var king_tile = board[king.board_position.x][king.board_position.y] as Tile
+	var enemy_color = "white" if king.color == "black" else "black"
+	return is_square_attacked(king_tile, enemy_color)
+
+func get_current_color() -> String:
+	return "white" if white_turn else "black"

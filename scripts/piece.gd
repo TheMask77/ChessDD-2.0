@@ -16,3 +16,6 @@ func _process(delta: float) -> void:
 	
 func get_move_pattern() -> Array[Vector2i]:
 	return []
+
+func _to_string() -> String:
+	return str(color, " ", piece_type, " at ", board_position)
