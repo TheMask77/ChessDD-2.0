@@ -19,6 +19,8 @@ const WHITE_ROOK = preload("res://scenes/White Pieces/White_Rook.tscn")
 const BLACK_TURN = preload("res://scenes/black_turn.tscn")
 const WHITE_TURN = preload("res://scenes/white_turn.tscn")
 
+signal game_over(winner: String, reason: String)
+
 var board_dim = Vector2i(8, 8)
 var temporary_tile = WHITE_TILE.instantiate() as Tile
 var tile_size = Vector2i(16, 16) # temporary_tile.get_tile_size()
@@ -30,7 +32,6 @@ var white_turn = true
 var white_turn_indicator = WHITE_TURN.instantiate()
 var black_turn_indicator = BLACK_TURN.instantiate()
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var tile
 	
@@ -105,7 +106,7 @@ func _on_tile_clicked(tile: Tile):
 			return
 		if !white_turn and tile.piece.color == "white":
 			return
-				
+		
 	if selected_piece == null:
 		if tile.piece != null:
 			selected_piece = tile.piece
@@ -114,16 +115,18 @@ func _on_tile_clicked(tile: Tile):
 	else:
 		if tile in highlighted_tiles:
 			move_piece(selected_piece, tile)
-			switch_turn()
-			print("=================================")
-			print("Current color: ", get_current_color())
-			var is_current_king_in_check = is_king_in_check(get_current_color())
-			print("is_current_king_in_check: ", is_current_king_in_check)
-			print("=================================")
-			print("\n")
+			clear_highlighted_tiles()
+			selected_piece = null
 			
-		clear_highlighted_tiles()
-		selected_piece = null
+		elif tile.piece != null and tile.piece.color == get_current_color():
+			clear_highlighted_tiles()
+			selected_piece = tile.piece
+			var possible_moves = get_possible_moves(selected_piece)
+			show_move_on_board(possible_moves)
+			
+		else:
+			clear_highlighted_tiles()
+			selected_piece = null
 
 func get_possible_moves(piece: Piece) -> Array[Vector2i]:
 	var moves: Array[Vector2i] = []
@@ -196,6 +199,7 @@ func move_piece(piece: Piece, target_tile: Tile):
 	piece.board_position = target_tile.board_position
 	target_tile.piece = piece
 	piece.position = target_tile.position
+	switch_turn()
 
 func is_within_board(pos: Vector2i) -> bool:
 	return pos.x >= 0 and pos.y >= 0 and pos.x < board_dim.x and pos.y < board_dim.y
@@ -207,9 +211,7 @@ func update_turn_indicator():
 func switch_turn():
 	white_turn = !white_turn
 	update_turn_indicator()
-
-func check_game_end():
-	pass
+	check_game_end()
 
 func get_king(color: String) -> Node:
 	for piece in get_all_pieces(color):
@@ -238,7 +240,60 @@ func is_king_in_check(color: String) -> bool:
 		return false
 	var king_tile = board[king.board_position.x][king.board_position.y] as Tile
 	var enemy_color = "white" if king.color == "black" else "black"
-	return is_square_attacked(king_tile, enemy_color)
+	var is_king_in_check = is_square_attacked(king_tile, enemy_color)
+	return is_king_in_check
 
 func get_current_color() -> String:
 	return "white" if white_turn else "black"
+
+func opposite_color(color: String) -> String:
+	return "black" if color == "white" else "white"
+
+func check_game_end():
+	var current_color = get_current_color()
+	var king = get_king(current_color)
+
+	# Caso 1: il re non esiste più
+	if king == null:
+		end_game(opposite_color(current_color), "king_captured")
+		return
+
+	# Caso 2: il re esiste
+	var in_check = is_king_in_check(current_color)
+	var can_move = has_legal_moves(current_color)
+
+	if not can_move:
+		if in_check:
+			end_game(opposite_color(current_color), "checkmate")
+		else:
+			end_game("draw", "stalemate")
+	# Altrimenti: partita continua
+
+func has_legal_moves(color: String) -> bool:
+	for piece in get_all_pieces(color):
+		var moves = get_possible_moves(piece)
+		for move in moves:
+			# Simulazione: spostiamo temporaneamente il pezzo
+			var from_tile = board[piece.board_position.x][piece.board_position.y]
+			var to_tile = board[move.x][move.y]
+			var captured = to_tile.piece
+
+			# Applichiamo la mossa
+			from_tile.piece = null
+			to_tile.piece = piece
+			var old_pos = piece.board_position
+			piece.board_position = move
+
+			var still_in_check = is_king_in_check(color)
+
+			# Rollback della mossa
+			piece.board_position = old_pos
+			from_tile.piece = piece
+			to_tile.piece = captured
+
+			if not still_in_check:
+				return true  # almeno una mossa legale trovata
+	return false
+
+func end_game(winner: String, reason: String) -> void:
+	emit_signal("game_over", winner, reason)

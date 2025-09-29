@@ -1,12 +1,20 @@
-[gd_scene load_steps=3 format=3 uid="uid://cjj4d7u8vguu"]
+[gd_scene load_steps=4 format=3 uid="uid://cjj4d7u8vguu"]
 
 [ext_resource type="Script" uid="uid://b0vd24b54my5h" path="res://scripts/main.gd" id="1_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://d0oddspgynvsd" path="res://scenes/Board.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://bbsqjt1dytcdf" path="res://scenes/EndGamePopup.tscn" id="3_sugp2"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_0wfyh")
+
+[node name="EndGamePopup" parent="." instance=ExtResource("3_sugp2")]
+visible = false
 
 [node name="Board" parent="." instance=ExtResource("1_o5qli")]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)
+
+[connection signal="quit_requested" from="EndGamePopup" to="." method="_on_end_game_popup_quit_requested"]
+[connection signal="restart_requested" from="EndGamePopup" to="." method="_on_end_game_popup_restart_requested"]
+[connection signal="game_over" from="Board" to="." method="_on_board_game_over"]
