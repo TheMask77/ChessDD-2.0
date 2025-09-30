@@ -66,10 +66,10 @@ func place_piece_instance(piece: Node2D, pos: Vector2i) -> void:
 
 # ---------- apply / undo move (per simulazioni e gioco reale) ----------
 # apply_move ritorna un dict con info per poter fare undo_move
-func apply_move(piece: Node, target_pos: Vector2i) -> Dictionary:
+func apply_move(piece: Piece, target_pos: Vector2i) -> Dictionary:
 	var from_pos = piece.board_position
 	var from_tile = get_tile(from_pos)
-	var to_tile = get_tile(target_pos)
+	var to_tile = get_tile(target_pos) as Tile
 	var meta = {
 		"piece": piece,
 		"from_pos": from_pos,
@@ -86,21 +86,23 @@ func apply_move(piece: Node, target_pos: Vector2i) -> Dictionary:
 	# handle en-passant capture
 	if piece.piece_type == "pawn" and target_pos == en_passant_target:
 		var captured_pawn_pos = Vector2i(target_pos.x, target_pos.y - piece.get_movement_direction())
-		var captured_tile = get_tile(captured_pawn_pos)
+		var captured_tile = get_tile(captured_pawn_pos) as Tile
 		if captured_tile and captured_tile.piece:
 			meta["captured"] = captured_tile.piece
 			meta["was_en_passant"] = true
 			# remove visually & logically
 			# captured_tile.piece.queue_free()
-			show_capture_piece(captured_tile.piece)
+			# show_capture_piece(captured_tile.piece, piece.board_position, captured_tile.board_position)
+			slash_capture(captured_tile.piece)
 			captured_tile.piece = null
 
 	# handle normal capture
 	if to_tile.piece != null and to_tile.piece != piece:
 		meta["captured"] = to_tile.piece
 		# free captured node (for the real game). For simulation we keep null but queue_free for real moves.
-		show_capture_piece(to_tile.piece)
+		# show_capture_piece(to_tile.piece, piece.board_position, to_tile.board_position)
 		# to_tile.piece.queue_free()
+		slash_capture(to_tile.piece)
 		to_tile.piece = null
 
 	# handle castling (only king moves of 2 files)
@@ -191,12 +193,55 @@ func undo_move(meta: Dictionary) -> void:
 	# restore en_passant
 	en_passant_target = meta.get("prev_en_passant", Vector2i(-1, -1))
 
-func move_piece_sprite(piece: Piece, to_tile: Tile):
+func move_piece_on_board(piece: Piece, to_tile: Tile):
 	var tween = get_tree().create_tween()
 	tween.tween_property(piece, "position", to_tile.position, 0.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
-func show_capture_piece(piece: Piece):
+func show_capture_piece(piece: Node, from_pos: Vector2i, to_pos: Vector2i):
+	print("Showing capture")
+	# direzione dal pezzo che attacca al catturato
+	var dir = (Vector2(to_pos - from_pos)).normalized() * tile_size.x * 0.3
+
 	var tween = get_tree().create_tween()
-	tween.tween_property(piece, "modulate:a", 0.0, 0.3) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(piece, "position", piece.position + dir, 0.2) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(piece, "modulate:a", 0.0, 0.25)
 	tween.finished.connect(func(): piece.queue_free())
+
+func slash_capture(piece: Sprite2D):
+	var tex = piece.texture
+	var pos = piece.position
+
+	# nascondo l’originale
+	piece.hide()
+
+	# Creo due copie
+	var upper = Sprite2D.new()
+	upper.texture = tex
+	upper.position = pos
+	var upper_mat = ShaderMaterial.new()
+	upper_mat.shader = preload("res://shaders/slash_capture.gdshader")
+	upper_mat.set_shader_parameter("upper_half", true)
+	upper.material = upper_mat
+	add_child(upper)
+
+	var lower = Sprite2D.new()
+	lower.texture = tex
+	lower.position = pos
+	var lower_mat = ShaderMaterial.new()
+	lower_mat.shader = upper_mat.shader
+	lower_mat.set_shader_parameter("upper_half", false)
+	lower.material = lower_mat
+	add_child(lower)
+
+	# Animazione separazione e dissolvenza
+	var tween = get_tree().create_tween()
+	tween.tween_property(upper, "position", pos + Vector2(-20, -20), 0.3)
+	tween.tween_property(lower, "position", pos + Vector2(20, 20), 0.3)
+	tween.parallel().tween_property(upper, "modulate:a", 0.0, 0.3)
+	tween.parallel().tween_property(lower, "modulate:a", 0.0, 0.3)
+	tween.finished.connect(func():
+		upper.queue_free()
+		lower.queue_free()
+		piece.queue_free()
+	)

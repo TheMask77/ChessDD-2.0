@@ -1,11 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://bqw52h144mtqe"]
 
 [ext_resource type="PackedScene" uid="uid://dw4guqspoid8l" path="res://scenes/Piece.tscn" id="1_5k1q8"]
-[ext_resource type="Texture2D" uid="uid://jc1ug7utrvpn" path="res://assets/WhitePieces.png" id="2_8gbke"]
+[ext_resource type="Texture2D" uid="uid://wto7fkirj28g" path="res://assets/white pieces/WhiteQueen.png" id="2_8gbke"]
 [ext_resource type="Script" uid="uid://bwdk83ryjmnr3" path="res://scripts/queen.gd" id="3_8gbke"]
 
 [node name="Sprite2D" instance=ExtResource("1_5k1q8")]
 texture = ExtResource("2_8gbke")
-region_enabled = true
 region_rect = Rect2(64, 0, 16, 16)
 script = ExtResource("3_8gbke")

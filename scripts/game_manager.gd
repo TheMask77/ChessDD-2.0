@@ -147,7 +147,7 @@ func _perform_move(piece: Node, target_tile: Tile) -> void:
 	# apply move via game_state (che si occuperà anche di en-passant / castling / has_moved)
 	var meta = game_state.apply_move(piece, target_tile.board_position)
 	# nel tuo codice precedente veniva fatto queue_free sui catturati; apply_move già chiama queue_free dove appropriato
-	game_state.move_piece_sprite(piece, target_tile)
+	game_state.move_piece_on_board(piece, target_tile)
 	# switch turn e check fine partita
 	_switch_turn()
 	_check_game_end()

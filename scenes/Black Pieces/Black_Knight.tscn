@@ -1,11 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://cospjlrw8frii"]
 
 [ext_resource type="PackedScene" uid="uid://dw4guqspoid8l" path="res://scenes/Piece.tscn" id="1_r5k83"]
-[ext_resource type="Texture2D" uid="uid://oma4kl5nb8bh" path="res://assets/BlackPieces.png" id="2_lnwoy"]
+[ext_resource type="Texture2D" uid="uid://cxne1w2netv2t" path="res://assets/BlackKnight.png" id="2_lnwoy"]
 [ext_resource type="Script" uid="uid://dm7woldacwtv1" path="res://scripts/knight.gd" id="3_lnwoy"]
 
 [node name="Sprite2D" instance=ExtResource("1_r5k83")]
 texture = ExtResource("2_lnwoy")
-region_enabled = true
 region_rect = Rect2(16, 0, 16, 16)
 script = ExtResource("3_lnwoy")

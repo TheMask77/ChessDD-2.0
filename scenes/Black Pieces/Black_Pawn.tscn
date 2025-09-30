@@ -1,11 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://paayxqjniivh"]
 
 [ext_resource type="PackedScene" uid="uid://dw4guqspoid8l" path="res://scenes/Piece.tscn" id="1_phuet"]
-[ext_resource type="Texture2D" uid="uid://oma4kl5nb8bh" path="res://assets/BlackPieces.png" id="2_y2ve1"]
+[ext_resource type="Texture2D" uid="uid://cn2dwhndcbn4l" path="res://assets/BlackPawn.png" id="2_y2ve1"]
 [ext_resource type="Script" uid="uid://cj7e7x6lhieqh" path="res://scripts/pawn.gd" id="3_y2ve1"]
 
 [node name="Sprite2D" instance=ExtResource("1_phuet")]
 texture = ExtResource("2_y2ve1")
-region_enabled = true
 region_rect = Rect2(0, 0, 16, 16)
 script = ExtResource("3_y2ve1")

@@ -1,11 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://cex3d4hh6xqlv"]
 
 [ext_resource type="PackedScene" uid="uid://dw4guqspoid8l" path="res://scenes/Piece.tscn" id="1_w8rm7"]
-[ext_resource type="Texture2D" uid="uid://oma4kl5nb8bh" path="res://assets/BlackPieces.png" id="2_ivkrk"]
+[ext_resource type="Texture2D" uid="uid://cshw3hmmsn1bw" path="res://assets/BlackRook.png" id="2_tm8ui"]
 [ext_resource type="Script" uid="uid://drnrxiwv2qtnk" path="res://scripts/rook.gd" id="3_8bxb7"]
 
 [node name="Sprite2D" instance=ExtResource("1_w8rm7")]
-texture = ExtResource("2_ivkrk")
-region_enabled = true
+texture = ExtResource("2_tm8ui")
 region_rect = Rect2(32, 0, 16, 16)
 script = ExtResource("3_8bxb7")
