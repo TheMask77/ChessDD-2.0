@@ -137,6 +137,15 @@ func get_possible_moves(piece: Piece) -> Array[Vector2i]:
 	if piece.piece_type == "pawn":
 		return get_pawn_possible_moves(piece)
 	
+	if piece.piece_type == "king" and not piece.has_moved:
+		# arrocco corto (king side)
+		if can_castle(piece, true):
+			moves.append(piece.board_position + Vector2i(2, 0))
+
+		# arrocco lungo (queen side)
+		if can_castle(piece, false):
+			moves.append(piece.board_position + Vector2i(-2, 0))
+	
 	for dir in directions:
 		var current_pos = piece.board_position + dir
 		
@@ -195,6 +204,30 @@ func clear_highlighted_tiles():
 
 func move_piece(piece: Piece, target_tile: Tile):
 	
+	if piece.piece_type == "king" and abs(target_tile.board_position.x - piece.board_position.x) == 2:
+		var y = piece.board_position.y
+		var rook_tile
+		var new_rook_pos
+		var rook
+		if target_tile.board_position.x > piece.board_position.x:
+			# arrocco corto
+			rook_tile = board[7][y]
+			rook = rook_tile.piece
+			new_rook_pos = board[5][y]
+		else:
+			# arrocco lungo
+			rook_tile = board[0][y]
+			rook = rook_tile.piece
+			new_rook_pos = board[3][y]
+
+		# sposta la torre
+		board[rook_tile.board_position.x][y].piece = null
+		rook.board_position = new_rook_pos.board_position
+		new_rook_pos.piece = rook
+		rook.position = new_rook_pos.position
+		rook.has_moved = true
+
+	
 	if piece.piece_type == "pawn" and target_tile.board_position == en_passant_target:
 		var captured_pawn_pos = Vector2i(target_tile.board_position.x, target_tile.board_position.y - piece.get_movement_direction())
 		var captured_pawn_tile = board[captured_pawn_pos.x][captured_pawn_pos.y]
@@ -207,7 +240,6 @@ func move_piece(piece: Piece, target_tile: Tile):
 		print("Chomp")
 		target_tile.piece.queue_free()
 	
-	
 	if piece.piece_type == "pawn":
 		var start_row = 6 if piece.color == "white" else 1
 		if abs(target_tile.board_position.y - piece.board_position.y) == 2 and piece.board_position.y == start_row:
@@ -218,16 +250,11 @@ func move_piece(piece: Piece, target_tile: Tile):
 	else:
 		en_passant_target = Vector2i(-1, -1)
 		
-	print("===============================")
-	print("piece_type: ", piece.piece_type)
-	print("target_tile.board_position: ", target_tile.board_position)
-	print("en_passant_target: ", en_passant_target)
-	print("===============================")
-		
 	board[piece.board_position.x][piece.board_position.y].piece = null
 	piece.board_position = target_tile.board_position
 	target_tile.piece = piece
 	piece.position = target_tile.position
+	piece.has_moved = true
 	switch_turn()
 
 func is_within_board(pos: Vector2i) -> bool:
@@ -326,3 +353,28 @@ func has_legal_moves(color: String) -> bool:
 
 func end_game(winner: String, reason: String) -> void:
 	emit_signal("game_over", winner, reason)
+
+func can_castle(king: Piece, king_side: bool) -> bool:
+	var king_y = king.board_position.y
+	var king_x = king.board_position.x
+	var color = king.color
+
+	# torre di riferimento
+	var rook_x = 7 if king_side else 0
+	var rook = board[rook_x][king_y].piece
+	if rook == null or rook.piece_type != "rook" or rook.has_moved:
+		return false
+
+	# caselle intermedie libere
+	var step = 1 if king_side else -1
+	for i in range(king_x + step, rook_x, step):
+		if board[i][king_y].piece != null:
+			return false
+
+	# re non deve passare per caselle attaccate
+	for i in range(0, 3): # max 2 caselle da controllare
+		var pos = Vector2i(king_x + step * i, king_y)
+		if is_square_attacked(board[pos.x][pos.y], opposite_color(color)):
+			return false
+
+	return true

@@ -4,6 +4,7 @@ class_name Piece
 var color: String = ""
 var board_position: Vector2i = Vector2i(-1, -1)
 var piece_type: String = ""
+var has_moved: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
