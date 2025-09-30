@@ -24,6 +24,7 @@ signal game_over(winner: String, reason: String)
 var board_dim = Vector2i(8, 8)
 var temporary_tile = WHITE_TILE.instantiate() as Tile
 var tile_size = Vector2i(16, 16) # temporary_tile.get_tile_size()
+var en_passant_target: Vector2i = Vector2i(-1, -1)
 
 var board = []
 var selected_piece = null
@@ -176,6 +177,8 @@ func get_pawn_possible_moves(pawn: Pawn) -> Array[Vector2i]:
 			var target_tile = board[diag.x][diag.y]
 			if target_tile.piece != null and target_tile.piece.color != pawn.color:
 				moves.append(diag)
+			elif diag == en_passant_target:
+				moves.append(diag)
 	
 	return moves
 
@@ -191,9 +194,35 @@ func clear_highlighted_tiles():
 	highlighted_tiles.clear()	
 
 func move_piece(piece: Piece, target_tile: Tile):
+	
+	if piece.piece_type == "pawn" and target_tile.board_position == en_passant_target:
+		var captured_pawn_pos = Vector2i(target_tile.board_position.x, target_tile.board_position.y - piece.get_movement_direction())
+		var captured_pawn_tile = board[captured_pawn_pos.x][captured_pawn_pos.y]
+		print("Removing en-p'd pawn at: ", captured_pawn_pos)
+		if captured_pawn_tile.piece != null:
+			captured_pawn_tile.piece.queue_free()
+			captured_pawn_tile.piece = null
+	
 	if target_tile.piece != null and target_tile.piece.color != piece.color:
 		print("Chomp")
 		target_tile.piece.queue_free()
+	
+	
+	if piece.piece_type == "pawn":
+		var start_row = 6 if piece.color == "white" else 1
+		if abs(target_tile.board_position.y - piece.board_position.y) == 2 and piece.board_position.y == start_row:
+			en_passant_target = Vector2i(piece.board_position.x, piece.board_position.y + piece.get_movement_direction())
+			print("Registering en-p target: ", en_passant_target)
+		else:
+			en_passant_target = Vector2i(-1, -1)
+	else:
+		en_passant_target = Vector2i(-1, -1)
+		
+	print("===============================")
+	print("piece_type: ", piece.piece_type)
+	print("target_tile.board_position: ", target_tile.board_position)
+	print("en_passant_target: ", en_passant_target)
+	print("===============================")
 		
 	board[piece.board_position.x][piece.board_position.y].piece = null
 	piece.board_position = target_tile.board_position
