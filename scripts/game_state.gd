@@ -91,14 +91,16 @@ func apply_move(piece: Node, target_pos: Vector2i) -> Dictionary:
 			meta["captured"] = captured_tile.piece
 			meta["was_en_passant"] = true
 			# remove visually & logically
-			captured_tile.piece.queue_free()
+			# captured_tile.piece.queue_free()
+			show_capture_piece(captured_tile.piece)
 			captured_tile.piece = null
 
 	# handle normal capture
 	if to_tile.piece != null and to_tile.piece != piece:
 		meta["captured"] = to_tile.piece
 		# free captured node (for the real game). For simulation we keep null but queue_free for real moves.
-		to_tile.piece.queue_free()
+		show_capture_piece(to_tile.piece)
+		# to_tile.piece.queue_free()
 		to_tile.piece = null
 
 	# handle castling (only king moves of 2 files)
@@ -134,7 +136,7 @@ func apply_move(piece: Node, target_pos: Vector2i) -> Dictionary:
 	from_tile.piece = null
 	to_tile.piece = piece
 	piece.board_position = target_pos
-	piece.position = to_tile.position
+	# piece.position = to_tile.position
 	meta["prev_has_moved"] = piece.has_moved
 	piece.has_moved = true
 
@@ -188,3 +190,13 @@ func undo_move(meta: Dictionary) -> void:
 
 	# restore en_passant
 	en_passant_target = meta.get("prev_en_passant", Vector2i(-1, -1))
+
+func move_piece_sprite(piece: Piece, to_tile: Tile):
+	var tween = get_tree().create_tween()
+	tween.tween_property(piece, "position", to_tile.position, 0.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+func show_capture_piece(piece: Piece):
+	var tween = get_tree().create_tween()
+	tween.tween_property(piece, "modulate:a", 0.0, 0.3) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.finished.connect(func(): piece.queue_free())
