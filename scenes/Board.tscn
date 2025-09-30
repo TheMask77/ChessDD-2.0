@@ -6,5 +6,3 @@
 script = ExtResource("1_qails")
 
 [node name="Pieces" type="Node2D" parent="."]
-
-[node name="TurnIndicator" type="Node2D" parent="."]

@@ -2,6 +2,7 @@ extends Node2D
 class_name GameManager
 
 signal game_over(winner: String, reason: String)
+signal turn_changed(color: String)
 
 const BLACK_TILE = preload("res://scenes/Black_Tile.tscn")
 const WHITE_TILE = preload("res://scenes/White_Tile.tscn")
@@ -20,11 +21,8 @@ const WHITE_BISHOP = preload("res://scenes/White Pieces/White_Bishop.tscn")
 const WHITE_QUEEN = preload("res://scenes/White Pieces/White_Queen.tscn")
 const WHITE_KING = preload("res://scenes/White Pieces/White_King.tscn")
 
-const WHITE_TURN = preload("res://scenes/white_turn.tscn")
-const BLACK_TURN = preload("res://scenes/black_turn.tscn")
-
+@onready var turn_indicator: TurnIndicator = $"../TurnIndicator"
 @onready var pieces_container = $Pieces
-@onready var turn_parent = $TurnIndicator if has_node("TurnIndicator") else self
 
 var game_state: GameState
 var move_gen: MoveGenerator
@@ -33,8 +31,6 @@ var move_gen: MoveGenerator
 var selected_piece = null
 var highlighted_tiles: Array = []
 var white_turn := true
-var white_turn_indicator
-var black_turn_indicator
 
 func _ready() -> void:
 	# crea oggetti di supporto
@@ -47,12 +43,7 @@ func _ready() -> void:
 	_create_tiles()
 
 	# turn indicators
-	white_turn_indicator = WHITE_TURN.instantiate()
-	black_turn_indicator = BLACK_TURN.instantiate()
-	turn_parent.add_child(white_turn_indicator)
-	turn_parent.add_child(black_turn_indicator)
-	white_turn_indicator.global_position = get_board_size() / 2 - Vector2(8, 8)
-	black_turn_indicator.global_position = get_board_size() / 2 - Vector2(8, 8)
+	turn_indicator.global_position = get_board_size() / 2 - Vector2(8, 8)
 	_update_turn_indicator()
 
 	# deploy armies
@@ -166,8 +157,7 @@ func _switch_turn() -> void:
 	_update_turn_indicator()
 
 func _update_turn_indicator() -> void:
-	white_turn_indicator.visible = white_turn
-	black_turn_indicator.visible = not white_turn
+	emit_signal("turn_changed", white_turn)
 
 func _current_color() -> String:
 	return "white" if white_turn else "black"

@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://batw5myl3l8je"]
+
+[ext_resource type="Script" uid="uid://dmjakwqycygk4" path="res://scripts/turn_indicator.gd" id="1_owo3g"]
+[ext_resource type="Texture2D" uid="uid://dovijcsjrjk0u" path="res://assets/white_turn.png" id="2_c7uef"]
+[ext_resource type="Texture2D" uid="uid://ddqx03frys5g6" path="res://assets/black_turn.png" id="3_c7uef"]
+
+[node name="TurnIndicator" type="Node2D"]
+z_index = -1
+script = ExtResource("1_owo3g")
+
+[node name="BlackTurnSprite" type="Sprite2D" parent="."]
+texture = ExtResource("3_c7uef")
+
+[node name="WhiteTurnSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_c7uef")
