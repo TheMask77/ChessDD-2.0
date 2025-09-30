@@ -1,8 +1,10 @@
 [gd_scene load_steps=2 format=3 uid="uid://d0oddspgynvsd"]
 
-[ext_resource type="Script" uid="uid://b0nwfnonu4sa" path="res://scripts/board.gd" id="1_qails"]
+[ext_resource type="Script" uid="uid://bqd4j6ba7c26k" path="res://scripts/game_manager.gd" id="1_qails"]
 
 [node name="Board" type="Node2D"]
 script = ExtResource("1_qails")
 
 [node name="Pieces" type="Node2D" parent="."]
+
+[node name="TurnIndicator" type="Node2D" parent="."]

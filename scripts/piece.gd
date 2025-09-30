@@ -1,15 +1,14 @@
 extends Node2D
 class_name Piece
 
-var color: String = ""
+var color: String = "grey"
 var board_position: Vector2i = Vector2i(-1, -1)
-var piece_type: String = ""
+var piece_type: String = "abstract"
 var has_moved: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	global_position = Vector2i(board_position.x * 16, board_position.y * 16)
-
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
