@@ -186,7 +186,7 @@ func _has_legal_moves(color: String) -> bool:
 		var moves = move_gen.get_possible_moves(game_state, piece)
 		for m in moves:
 			# apply temporaneo
-			var meta = game_state.apply_move(piece, m)
+			var meta = game_state.apply_move(piece, m, true)
 			var still_in_check = move_gen.is_king_in_check(game_state, color)
 			# undo
 			game_state.undo_move(meta)

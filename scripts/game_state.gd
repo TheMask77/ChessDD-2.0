@@ -66,7 +66,7 @@ func place_piece_instance(piece: Node2D, pos: Vector2i) -> void:
 
 # ---------- apply / undo move (per simulazioni e gioco reale) ----------
 # apply_move ritorna un dict con info per poter fare undo_move
-func apply_move(piece: Piece, target_pos: Vector2i) -> Dictionary:
+func apply_move(piece: Piece, target_pos: Vector2i, simulated: bool = false) -> Dictionary:
 	var from_pos = piece.board_position
 	var from_tile = get_tile(from_pos)
 	var to_tile = get_tile(target_pos) as Tile
@@ -93,7 +93,8 @@ func apply_move(piece: Piece, target_pos: Vector2i) -> Dictionary:
 			# remove visually & logically
 			# captured_tile.piece.queue_free()
 			# show_capture_piece(captured_tile.piece, piece.board_position, captured_tile.board_position)
-			slash_capture(captured_tile.piece)
+			if !simulated:
+				slash_capture(captured_tile.piece)
 			captured_tile.piece = null
 
 	# handle normal capture
@@ -102,7 +103,8 @@ func apply_move(piece: Piece, target_pos: Vector2i) -> Dictionary:
 		# free captured node (for the real game). For simulation we keep null but queue_free for real moves.
 		# show_capture_piece(to_tile.piece, piece.board_position, to_tile.board_position)
 		# to_tile.piece.queue_free()
-		slash_capture(to_tile.piece)
+		if !simulated:
+			slash_capture(to_tile.piece)
 		to_tile.piece = null
 
 	# handle castling (only king moves of 2 files)
