@@ -8,8 +8,7 @@ signal restart_requested
 signal quit_requested
 
 func _ready() -> void:
-	restart_button.text = "Restart"
-	quit_button.text = "Quit"
+	pass
 
 func show_end_game(winner: String, reason: String):
 	match reason:

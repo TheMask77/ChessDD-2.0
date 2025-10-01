@@ -145,10 +145,12 @@ func _clear_highlight() -> void:
 
 func _perform_move(piece: Node, target_tile: Tile) -> void:
 	# apply move via game_state (che si occuperà anche di en-passant / castling / has_moved)
+	var check = move_gen.is_king_in_check(game_state,piece.color)
+	@warning_ignore("unused_variable")
 	var meta = game_state.apply_move(piece, target_tile.board_position)
 	# nel tuo codice precedente veniva fatto queue_free sui catturati; apply_move già chiama queue_free dove appropriato
 	game_state.move_piece_on_board(piece, target_tile)
-	if move_gen.is_king_in_check(game_state,piece.color):
+	if check and move_gen.is_king_in_check(game_state,piece.color):
 		emit_signal("game_over", piece.color, "not moved out of check")
 	# switch turn e check fine partita
 	_switch_turn()
