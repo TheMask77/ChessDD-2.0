@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ChessDD 2.0"
-run/main_scene="uid://cjj4d7u8vguu"
+run/main_scene="uid://cor72vy0gq1vn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 

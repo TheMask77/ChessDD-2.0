@@ -17,7 +17,3 @@ func _on_end_game_popup_quit_requested() -> void:
 func _on_end_game_popup_restart_requested() -> void:
 	print("Pressed restart")
 	get_tree().reload_current_scene()
-
-
-func _on_button_test_press_signal() -> void:
-	print("Signal received")
